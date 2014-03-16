@@ -97,9 +97,25 @@
         classType["[object " + name + "]"] = name.toLowerCase();
     });
     mt.settings = {
-        isHtmlEncode: true
+        isTextEncode: true,
+        isHtmlEncode: false
     };
-
+    
+    //HTML转义
+    mt._encodeHTML = function (source) {
+        return String(source)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\\/g, '&#92;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    };
+    //转义影响正则的字符
+    mt._encodeReg = function (source) {
+        return String(source).replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
+    };
+    
     function handleDataItem(templateContent) {
         var match = templateContent.match(dataRegex),
             dataItems = [],
@@ -281,11 +297,15 @@
             if (result.indexOf(replaceItem) > 0) {
                 //处理Item 取到相关的数据
                 var value = renderData(data, currItem.tree);
+                if (mt.settings.isTextEncode) {
+                    value = mt._encodeHTML(value);
+                }
                 //regReplace = new RegExp(replaceItem.replace('{', '\\{').replace('}', '\\}').replace('(', '\\(').replace(')', '\\)').replace('$', '\\$'), 'g');
                 //result = result.replace(regReplace, value);
-                while (result.indexOf(replaceItem) > 0) {
-                    result = result.replace(replaceItem, value);
-                }
+                //while (result.indexOf(replaceItem) > 0) {
+                //    result = result.replace(replaceItem, value);
+                //}
+                result = result.replace(new RegExp(mt._encodeReg(replaceItem), 'g'), value);
             }
         }
         return result;

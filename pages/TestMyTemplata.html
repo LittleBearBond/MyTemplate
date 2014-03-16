@@ -23,7 +23,7 @@
             var list = $('#List1');
             var executeRender = BearTemplate("temp1"),
                 version = window.BearTemplate.vesion,
-                data = [{ index: 1, name: 'xj' }, { index: 2, name: 'bear' }];
+                data = [{ index: 1, name: 'xj', "js": "<script>" }, { index: 2, name: 'bear', "js": "<html>" }];
             console.log(version);
             //外部循环
             for (var i = 0, len = data.length; i < len ; i++) {
@@ -44,7 +44,7 @@
 <body>
     <ul id="List1"></ul>
     <script type="text/plain" id="temp1">
-        <li index="{@index}">{@name}-----{$Test(@index,@name)}-----{@Index}</li>
+        <li index="{@index}">{@name}-----{$Test(@index,@name)}-----{@Index}------{@js}</li>
     </script>
 </body>
 </html>
