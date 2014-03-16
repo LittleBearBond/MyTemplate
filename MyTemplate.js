@@ -1,4 +1,9 @@
-﻿(function (global) {
+﻿/**
+ * BearTemplate1.0.0  版本
+ * https://github.com/LittleBearBond/MyTemplate
+ * 2014-03-16
+*/
+(function (global) {
     var dataRegex = /\{[\@\$].+?\}/ig,
         funcs = {},
         nativeForEach = Array.prototype.forEach,
@@ -12,9 +17,9 @@
         //存储要替换的对象
         var dataItems,
             html = /^(textarea|input)$/i.test(template.nodeName) ? template.value : template.innerHTML,
-            templateContent = html.replace(/(^\s*)/g, '').replace(/(\s*)$/g, ''); //模板文本
+            templateContent = mt.trim(html); //模板文本
         //把编码的替换回来
-        templateContent = templateContent.replace(/%7B/ig, "{").replace(/%7D/ig, "}").replace(/%28/ig, "(").replace(/%29/ig, ")");
+        templateContent = mt._decodeChar(templateContent);
         dataItems = handleDataItem(templateContent);
         var render = function (data, gData) {
             var tpl = templateContent,
@@ -34,6 +39,7 @@
     };
     var mt = global.BearTemplate;
     mt.vesion = "1.0.0";
+    
     mt.extend = function () {
         var o = {},
             c,
@@ -57,8 +63,11 @@
         }
         return o;
     };
+    
     mt.toString = classType.toString;
+    
     mt.hasOwn = classType.hasOwnProperty;
+    
     mt.type = function (obj) {
         if (obj == null) {
             return obj + "";
@@ -67,12 +76,15 @@
             classType[mt.toString.call(obj)] || "object" :
             typeof obj;
     };
+    
     mt.isArray = Array.isArray || function (obj) {
         return mt.type(obj) === "array";
     };
+    
     mt.isFunction = function (obj) {
         return mt.type(obj) === "function";
     };
+    
     mt.each = function (obj, callback, context) {
         if (obj == null) {
             return;
@@ -88,17 +100,23 @@
             }
         }
     };
+    
     //判断是否是Object类型
     mt.isObject = function (source) {
         return (!!source) && (source.constructor === Object);
     };
+    
     //处理模板替换对象
     mt.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function (name, i) {
         classType["[object " + name + "]"] = name.toLowerCase();
     });
-    mt.settings = {
-        isTextEncode: true,
-        isHtmlEncode: false
+    
+    mt.trim = function (str) {
+        return str.replace(/(^\s*)/g, '').replace(/(\s*)$/g, '');
+    };
+    
+    mt._decodeChar = function (str) {
+        return str.replace(/%7B/ig, "{").replace(/%7D/ig, "}").replace(/%28/ig, "(").replace(/%29/ig, ")")
     };
     
     //HTML转义
@@ -111,9 +129,15 @@
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
     };
+    
     //转义影响正则的字符
     mt._encodeReg = function (source) {
         return String(source).replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
+    };
+
+    mt.settings = {
+        isTextEncode: true,
+        isHtmlEncode: false
     };
     
     function handleDataItem(templateContent) {
