@@ -3,23 +3,37 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <script src="../Scripts/jquery-1.11.0.js"></script>
+
     <script src="../MyTemplate.js"></script>
     <title></title>
     <style>
-        #List1 li {
-            list-style-type: none;
+        #List1 {
+            width: 500px;
         }
+
+            #List1 li {
+                list-style-type: none;
+                height: 30px;
+                background-color: #00b2ff;
+                margin-top: 5px;
+            }
     </style>
     <script type="text/javascript">
         $(function () {
             var list = $('#List1');
-            var temp = $('#temp1').BearTemplate(),
+            var executeRender = BearTemplate("temp1"),
+                version = window.BearTemplate.vesion,
                 data = [{ index: 1, name: 'xj' }, { index: 2, name: 'bear' }];
+            console.log(version);
+            //外部循环
             for (var i = 0, len = data.length; i < len ; i++) {
-                var currData = data[i];
-                var ht = temp.executeRender(currData, { Index: i + 1 });
+                var currData = data[i],
+                    ht = executeRender(currData, { Index: i + 1 });
                 list.append(ht);
             }
+            //一次性添加
+            var result = executeRender(data, { Index: i + 1 });
+            list.append(result);
         });
 
         function Test(index, name) {
