@@ -2,17 +2,19 @@
  * BearTemplate1.0.0  版本
  * https://github.com/LittleBearBond/MyTemplate
  * 2014-03-16
-*/
-(function (global) {
+ */
+(function(global) {
     var dataRegex = /\{[\@\$].+?\}/ig,
         funcs = {},
         nativeForEach = Array.prototype.forEach,
         classType = {};
-    global.BearTemplate = function (templateObj, sets) {
+    global.BearTemplate = function(templateObj, sets) {
         var template = document.getElementById(templateObj);
         sets && mt.isObject(sets) && (funcs = mt.extend({}, sets));
         if (!template) {
-            return function () { return "模板为空"; };
+            return function() {
+                return "模板为空";
+            };
         }
         //存储要替换的对象
         var dataItems,
@@ -21,12 +23,13 @@
         //把编码的替换回来
         templateContent = mt._decodeChar(templateContent);
         dataItems = handleDataItem(templateContent);
-        var render = function (data, gData) {
+
+        var render = function(data, gData) {
             var tpl = templateContent,
                 handleResult = [];
             mt.isObject(data) && (data = mt.extend(data, gData));
             if (mt.isArray(data)) {
-                mt.each(data, function (val) {
+                mt.each(data, function(val) {
                     gData && (val = mt.extend({}, val, gData));
                     handleResult.push(excuteRender(dataItems, tpl, val));
                 });
@@ -37,10 +40,11 @@
         };
         return render;
     };
+
     var mt = global.BearTemplate;
     mt.vesion = "1.0.0";
-    
-    mt.extend = function () {
+
+    mt.extend = function() {
         var o = {},
             c,
             args = arguments,
@@ -52,7 +56,6 @@
                 mt.hasOwn.call(src, c) && (o[c] = src[c]);
             }
         }
-
         for (; start < len; start++) {
             var curr = args[start];
             if (mt.isObject(curr)) {
@@ -63,12 +66,12 @@
         }
         return o;
     };
-    
+
     mt.toString = classType.toString;
-    
+
     mt.hasOwn = classType.hasOwnProperty;
-    
-    mt.type = function (obj) {
+
+    mt.type = function(obj) {
         if (obj == null) {
             return obj + "";
         }
@@ -76,16 +79,16 @@
             classType[mt.toString.call(obj)] || "object" :
             typeof obj;
     };
-    
-    mt.isArray = Array.isArray || function (obj) {
+
+    mt.isArray = Array.isArray || function(obj) {
         return mt.type(obj) === "array";
     };
-    
-    mt.isFunction = function (obj) {
+
+    mt.isFunction = function(obj) {
         return mt.type(obj) === "function";
     };
-    
-    mt.each = function (obj, callback, context) {
+
+    mt.each = function(obj, callback, context) {
         if (obj == null) {
             return;
         }
@@ -100,27 +103,27 @@
             }
         }
     };
-    
+
     //判断是否是Object类型
-    mt.isObject = function (source) {
+    mt.isObject = function(source) {
         return (!!source) && (source.constructor === Object);
     };
-    
+
     //处理模板替换对象
-    mt.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function (name, i) {
+    mt.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(name, i) {
         classType["[object " + name + "]"] = name.toLowerCase();
     });
-    
-    mt.trim = function (str) {
+
+    mt.trim = function(str) {
         return str.replace(/(^\s*)/g, '').replace(/(\s*)$/g, '');
     };
-    
-    mt._decodeChar = function (str) {
+
+    mt._decodeChar = function(str) {
         return str.replace(/%7B/ig, "{").replace(/%7D/ig, "}").replace(/%28/ig, "(").replace(/%29/ig, ")")
     };
-    
+
     //HTML转义
-    mt._encodeHTML = function (source) {
+    mt._encodeHTML = function(source) {
         return String(source)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -129,9 +132,9 @@
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
     };
-    
+
     //转义影响正则的字符
-    mt._encodeReg = function (source) {
+    mt._encodeReg = function(source) {
         return String(source).replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
     };
 
@@ -139,19 +142,23 @@
         isTextEncode: true,
         isHtmlEncode: false
     };
-    
+
     function handleDataItem(templateContent) {
         var match = templateContent.match(dataRegex),
             dataItems = [],
             item;
         if (match && match.length) {
-            var i = 0, len = match.length, matchItem;
+            var i = 0,
+                len = match.length,
+                matchItem;
             for (; i < len; i++) {
                 //得到要替换的 如{@name}
                 matchItem = match[i];
                 //得到匹配结果 去掉左右的{}得到如：@name
                 item = matchItem.substring(1, matchItem.length - 1);
-                var hasItem = false, j = 0, dataItemsLen = dataItems.length;
+                var hasItem = false,
+                    j = 0,
+                    dataItemsLen = dataItems.length;
                 //判断是否已经处理过该项
                 for (; j < dataItemsLen; j++) {
                     if (item == dataItems[j].item) {
@@ -189,16 +196,26 @@
             case "$":
                 var func = readFunc(item);
                 //处理得到函数的名字，以及函数的参数args，用于后续的apply
-                tree.push({ type: "function", name: func.name, args: next(func.spare) });
+                tree.push({
+                    type: "function",
+                    name: func.name,
+                    args: next(func.spare)
+                });
                 break;
             case "@":
                 var para = readParam(item);
-                tree.push({ type: "param", name: para.name });
+                tree.push({
+                    type: "param",
+                    name: para.name
+                });
                 next(para.spare, tree); //递归处理剩下的
                 break;
             default:
                 var constPara = readConst(item);
-                tree.push({ type: "const", value: constPara.value });
+                tree.push({
+                    type: "const",
+                    value: constPara.value
+                });
                 next(constPara.spare, tree); //递归处理剩下的
                 break;
         }
@@ -226,8 +243,8 @@
             itemLen = item.length,
             spare,
             paramName = index < 0 ? //是否是多个对象  @index,@name
-                item.substring(1, itemLen) : //只是一个,直接取得名字
-                item.substring(1, index); //取得第一个
+            item.substring(1, itemLen) : //只是一个,直接取得名字
+            item.substring(1, index); //取得第一个
         spare = index < 0 ?
             '' : //这个只是空
             item.substring(1 + paramName.length + 1, itemLen); //取得剩下的部分 @name
@@ -244,8 +261,8 @@
             itemLen = item.length,
             spare,
             value = index < 0 ?
-                item.substring(0, itemLen) :
-                item.substring(0, index);
+            item.substring(0, itemLen) :
+            item.substring(0, index);
         spare = index < 0 ?
             '' :
             item.substring(value.length + 1, itemLen);
@@ -258,7 +275,8 @@
     //执行相关操作，得到处理后的数据
 
     function renderData(data, tree) {
-        var result = "", root;
+        var result = "",
+            root;
         root = mt.isArray(tree) && tree.length ? tree[0] : tree;
         if (root == null) {
             return result;
@@ -290,7 +308,9 @@
     //处理多个参数，循环调用renderData 取到每个参数对应的数据，构造成数组
 
     function makeArgs(data, tree) {
-        var args = [], i = 0, len = tree.length;
+        var args = [],
+            i = 0,
+            len = tree.length;
         if (mt.isArray(tree)) {
             for (; i < len; i++) {
                 args.push(renderData(data, tree[i]));
@@ -314,11 +334,12 @@
         var result = tpl,
             i = 0,
             dataItemslen = dataItems.length;
-        //执行相关替换，得到对于的模板                        
+        //执行相关替换，得到对于的模板
         for (; i < dataItemslen; i++) {
-            var currItem = dataItems[i], replaceItem = currItem.replaceItem;
+            var currItem = dataItems[i],
+                replaceItem = currItem.replaceItem;
             //处理过后的模板中存在这个键  这里有待优化  每次检查性能肯定有影响
-            if (result.indexOf(replaceItem) > 0) {
+            if (!!~result.indexOf(replaceItem)) {
                 //处理Item 取到相关的数据
                 var value = renderData(data, currItem.tree);
                 if (mt.settings.isTextEncode) {
